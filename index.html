@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bible Verse Creator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Montserrat',sans-serif;
+  background:#0d0d0d;
+  color:white;
+  display:flex;
+  min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:70px;
+  background:#111;
+  border-right:1px solid #222;
+  transition:.4s;
+  display:flex;
+  flex-direction:column;
+  padding:15px 0;
+}
+.sidebar:hover{width:240px}
+.sidebar button{
+  background:none;
+  border:none;
+  color:white;
+  padding:15px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  cursor:pointer;
+}
+.sidebar span{opacity:0;white-space:nowrap;transition:.3s}
+.sidebar:hover span{opacity:1}
+
+/* MAIN */
+main{flex:1;padding:20px}
+header{
+  background:#181818;
+  padding:15px;
+  border-radius:12px;
+  text-align:center;
+  margin-bottom:20px;
+}
+header h1{color:#ffd700}
+
+/* CANVAS */
+.canvas-wrapper{
+  max-width:900px;
+  margin:auto;
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:0 0 25px rgba(255,255,255,.2);
+}
+#container{
+  position:relative;
+  width:100%;
+  padding-bottom:56.25%;
+  background:#000 center/cover no-repeat;
+}
+#verso,#referencia{
+  position:absolute;
+  text-shadow:2px 2px 10px rgba(0,0,0,.8);
+}
+#verso{top:10%;left:5%;font-size:32px;max-width:90%}
+#referencia{bottom:10%;left:5%;font-size:20px}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:10;
+}
+.modal-content{
+  background:#181818;
+  padding:20px;
+  border-radius:12px;
+  width:360px;
+}
+.modal-content h3{color:#ffd700;margin-bottom:10px}
+.modal-content label{font-size:.85rem}
+.modal-content input,
+.modal-content select,
+.modal-content button{
+  width:100%;
+  padding:8px;
+  margin:6px 0;
+  background:#222;
+  border:none;
+  border-radius:8px;
+  color:white;
+}
+.modal-content button:hover{background:#333}
+
+mark{background:none;font-weight:900}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <button onclick="openModal('mBuscar')">📖 <span>Buscar</span></button>
+  <button onclick="openModal('mTexto')">✍️ <span>Texto</span></button>
+  <button onclick="openModal('mPosicao')">📐 <span>Posição</span></button>
+  <button onclick="openModal('mFundo')">🖼 <span>Fundo</span></button>
+  <button onclick="toggleRef()">👁 <span>Referência</span></button>
+  <button onclick="baixarImagem()">📸 <span>Baixar</span></button>
+</div>
+
+<main>
+<header><h1>BIBLE VERSE CREATOR</h1></header>
+<div class="canvas-wrapper">
+  <div id="container">
+    <div id="verso">Selecione um versículo...</div>
+    <div id="referencia">MATEUS 11:28</div>
+  </div>
+</div>
+</main>
+
+<!-- MODAIS -->
+<div class="modal" id="mBuscar">
+  <div class="modal-content">
+    <h3>Buscar Versículo</h3>
+    <select id="livro"></select>
+    <select id="capitulo"></select>
+    <select id="versiculo"></select>
+    <button onclick="buscarVersiculo()">Buscar</button>
+    <button onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<div class="modal" id="mTexto">
+  <div class="modal-content">
+    <h3>Texto</h3>
+
+    <label>Tamanho do Verso</label>
+    <input type="range" id="tamanhoVerso" min="18" max="72" value="32">
+
+    <label>Tamanho da Referência</label>
+    <input type="range" id="tamanhoRef" min="12" max="48" value="20">
+
+    <label>Fonte do Verso</label>
+    <select id="fonteVerso">
+      <option value="'Montserrat', sans-serif">Montserrat</option>
+      <option value="'Century Gothic', CenturyGothic, AppleGothic, sans-serif">Century Gothic</option>
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="Georgia, serif">Georgia</option>
+    </select>
+
+    <label>Fonte da Referência</label>
+    <select id="fonteRef">
+      <option value="'Montserrat', sans-serif">Montserrat</option>
+      <option value="'Century Gothic', CenturyGothic, AppleGothic, sans-serif">Century Gothic</option>
+    </select>
+
+    <label>Cor do Verso</label>
+    <input type="color" id="corVerso" value="#ffffff">
+
+    <label>Cor da Referência</label>
+    <input type="color" id="corReferencia" value="#ffffff">
+
+    <label>Destaques (separar por vírgula)</label>
+    <input id="textoDestaque" placeholder="Ex: SENHOR, descanso, pastor">
+
+    <label>Cor do Destaque</label>
+    <input type="color" id="corDestaque" value="#ffd700">
+
+    <button onclick="aplicarDestaques()">Aplicar Destaques</button>
+    <button onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<div class="modal" id="mPosicao">
+  <div class="modal-content">
+    <h3>Posição</h3>
+
+    <label>Verso Vertical</label>
+    <input type="range" id="posicaoVerso" min="0" max="80" value="10">
+
+    <label>Verso Horizontal</label>
+    <input type="range" id="posicaoVersoH" min="0" max="90" value="5">
+
+    <label>Ref Vertical</label>
+    <input type="range" id="posicaoRef" min="0" max="80" value="10">
+
+    <label>Ref Horizontal</label>
+    <input type="range" id="posicaoRefH" min="0" max="90" value="5">
+
+    <button onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<div class="modal" id="mFundo">
+  <div class="modal-content">
+    <h3>Fundo</h3>
+    <input type="file" id="uploadFundo">
+    <button onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<script>
+const livros={"Gênesis":50,"Êxodo":40,"Levítico":27,"Números":36,"Deuteronômio":34,"Josué":24,"Juízes":21,"Rute":4,"1 Samuel":31,"2 Samuel":24,"Salmos":150,"Provérbios":31,"Isaías":66,"Mateus":28,"Marcos":16,"Lucas":24,"João":21,"Romanos":16,"Apocalipse":22};
+
+const livro=document.getElementById("livro");
+const versoEl=document.getElementById("verso");
+const refEl=document.getElementById("referencia");
+const container=document.getElementById("container");
+let textoOriginal="";
+
+for(let l in livros) livro.innerHTML+=`<option>${l}</option>`;
+livro.onchange=()=>{
+  capitulo.innerHTML="";
+  for(let i=1;i<=livros[livro.value];i++) capitulo.innerHTML+=`<option>${i}</option>`;
+  versiculo.innerHTML="";
+  for(let i=1;i<=60;i++) versiculo.innerHTML+=`<option>${i}</option>`;
+};
+livro.onchange();
+
+async function buscarVersiculo(){
+  const r=await fetch(`https://bible-api.com/${livro.value}+${capitulo.value}:${versiculo.value}?translation=almeida`);
+  const d=await r.json();
+  textoOriginal=d.text.toUpperCase();
+  versoEl.innerText=textoOriginal;
+  refEl.innerText=`${livro.value.toUpperCase()} ${capitulo.value}:${versiculo.value}`;
+  closeModal();
+}
+
+tamanhoVerso.oninput=e=>versoEl.style.fontSize=e.target.value+"px";
+tamanhoRef.oninput=e=>refEl.style.fontSize=e.target.value+"px";
+fonteVerso.onchange=e=>versoEl.style.fontFamily=e.target.value;
+fonteRef.onchange=e=>refEl.style.fontFamily=e.target.value;
+corVerso.oninput=e=>versoEl.style.color=e.target.value;
+corReferencia.oninput=e=>refEl.style.color=e.target.value;
+
+posicaoVerso.oninput=e=>versoEl.style.top=e.target.value+"%";
+posicaoVersoH.oninput=e=>versoEl.style.left=e.target.value+"%";
+posicaoRef.oninput=e=>refEl.style.bottom=e.target.value+"%";
+posicaoRefH.oninput=e=>refEl.style.left=e.target.value+"%";
+
+function aplicarDestaques(){
+  if(!textoOriginal) return;
+  let texto=textoOriginal;
+  textoDestaque.value.split(",").forEach(p=>{
+    p=p.trim();
+    if(p){
+      texto=texto.replace(new RegExp(`(${p})`,"gi"),
+        `<mark style="color:${corDestaque.value}">$1</mark>`);
+    }
+  });
+  versoEl.innerHTML=texto;
+}
+
+uploadFundo.onchange=e=>{
+  const r=new FileReader();
+  r.onload=()=>container.style.backgroundImage=`url('${r.result}')`;
+  r.readAsDataURL(e.target.files[0]);
+};
+
+let refVisivel=true;
+function toggleRef(){refVisivel=!refVisivel;refEl.style.display=refVisivel?"block":"none";}
+function openModal(id){document.getElementById(id).style.display="flex";}
+function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none");}
+function baixarImagem(){
+  html2canvas(container).then(c=>{
+    const a=document.createElement("a");
+    a.href=c.toDataURL("image/png");
+    a.download="versiculo.png";
+    a.click();
+  });
+}
+</script>
+
+</body>
+</html>
