@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bible Verse Creator</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+
 body{
-  font-family:'Montserrat',sans-serif;
+  font-family:'Century Gothic', CenturyGothic, AppleGothic, 'Montserrat', sans-serif;
   background:#0d0d0d;
   color:white;
   display:flex;
@@ -20,46 +21,53 @@ body{
 
 /* SIDEBAR */
 .sidebar{
-  width:70px;
+  width:72px;
   background:#111;
   border-right:1px solid #222;
-  transition:.4s;
+  transition:.35s ease;
   display:flex;
   flex-direction:column;
-  padding:15px 0;
+  padding:18px 0;
 }
 .sidebar:hover{width:240px}
 .sidebar button{
   background:none;
   border:none;
   color:white;
-  padding:15px;
+  padding:14px 16px;
   display:flex;
   gap:12px;
   align-items:center;
   cursor:pointer;
+  font-size:15px;
+  transition:.25s;
 }
+.sidebar button:hover{background:#1a1a1a}
 .sidebar span{opacity:0;white-space:nowrap;transition:.3s}
 .sidebar:hover span{opacity:1}
 
 /* MAIN */
-main{flex:1;padding:20px}
+main{flex:1;padding:24px}
 header{
   background:#181818;
-  padding:15px;
-  border-radius:12px;
+  padding:16px;
+  border-radius:14px;
   text-align:center;
-  margin-bottom:20px;
+  margin-bottom:24px;
 }
-header h1{color:#ffd700}
+header h1{
+  color:#ffd700;
+  letter-spacing:1px;
+  font-weight:700;
+}
 
 /* CANVAS */
 .canvas-wrapper{
-  max-width:900px;
+  max-width:960px;
   margin:auto;
-  border-radius:15px;
+  border-radius:18px;
   overflow:hidden;
-  box-shadow:0 0 25px rgba(255,255,255,.2);
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
 }
 #container{
   position:relative;
@@ -69,16 +77,28 @@ header h1{color:#ffd700}
 }
 #verso,#referencia{
   position:absolute;
-  text-shadow:2px 2px 10px rgba(0,0,0,.8);
+  text-shadow:2px 4px 14px rgba(0,0,0,.85);
 }
-#verso{top:10%;left:5%;font-size:32px;max-width:90%}
-#referencia{bottom:10%;left:5%;font-size:20px}
+#verso{
+  top:10%;
+  left:6%;
+  font-size:34px;
+  max-width:88%;
+  line-height:1.45;
+  font-weight:600;
+}
+#referencia{
+  bottom:9%;
+  left:6%;
+  font-size:20px;
+  opacity:.9;
+}
 
 /* MODAL */
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.65);
   display:none;
   justify-content:center;
   align-items:center;
@@ -86,26 +106,58 @@ header h1{color:#ffd700}
 }
 .modal-content{
   background:#181818;
-  padding:20px;
-  border-radius:12px;
-  width:360px;
+  padding:22px;
+  border-radius:16px;
+  width:380px;
+  max-height:85vh;
+  overflow-y:auto;
+  position:relative;
 }
-.modal-content h3{color:#ffd700;margin-bottom:10px}
-.modal-content label{font-size:.85rem}
+.modal-content h3{
+  color:#ffd700;
+  margin-bottom:12px;
+  text-align:center;
+}
 .modal-content input,
 .modal-content select,
 .modal-content button{
   width:100%;
-  padding:8px;
-  margin:6px 0;
+  padding:10px;
+  margin:7px 0;
   background:#222;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   color:white;
+}
+.modal-content button{
+  font-weight:600;
+  cursor:pointer;
 }
 .modal-content button:hover{background:#333}
 
-mark{background:none;font-weight:900}
+.btn-fechar{
+  position:absolute;
+  top:12px;
+  right:14px;
+  background:none;
+  border:none;
+  color:#aaa;
+  font-size:20px;
+  cursor:pointer;
+}
+.btn-fechar:hover{color:#fff}
+
+.resultado{
+  padding:10px;
+  background:#222;
+  border-radius:10px;
+  margin-bottom:8px;
+  cursor:pointer;
+  font-size:.85rem;
+}
+.resultado:hover{background:#333}
+
+mark{background:none;font-weight:800}
 </style>
 </head>
 
@@ -122,145 +174,161 @@ mark{background:none;font-weight:900}
 
 <main>
 <header><h1>BIBLE OFICIAL</h1></header>
+
 <div class="canvas-wrapper">
   <div id="container">
     <div id="verso">Selecione um versículo...</div>
-    <div id="referencia">MATEUS 11:28</div>
+    <div id="referencia"></div>
   </div>
 </div>
 </main>
 
-<!-- MODAIS -->
+<!-- BUSCAR -->
 <div class="modal" id="mBuscar">
   <div class="modal-content">
+    <button class="btn-fechar" onclick="closeModal()">✖</button>
     <h3>Buscar Versículo</h3>
+
+    <input id="buscaPalavra" placeholder="Palavra ou frase">
+    <button onclick="buscarPorPalavra()">Buscar Palavra</button>
+
     <select id="livro"></select>
     <select id="capitulo"></select>
     <select id="versiculo"></select>
-    <button onclick="buscarVersiculo()">Buscar</button>
-    <button onclick="closeModal()">Fechar</button>
+    <button onclick="buscarVersiculo()">Buscar Referência</button>
+
+    <div id="listaResultados"></div>
   </div>
 </div>
 
+<!-- TEXTO -->
 <div class="modal" id="mTexto">
   <div class="modal-content">
+    <button class="btn-fechar" onclick="closeModal()">✖</button>
     <h3>Texto</h3>
 
-    <label>Tamanho do Verso</label>
-    <input type="range" id="tamanhoVerso" min="18" max="72" value="32">
+    <label>Tamanho Verso</label>
+    <input type="range" id="tamanhoVerso" min="18" max="72" value="34">
 
-    <label>Tamanho da Referência</label>
+    <label>Tamanho Referência</label>
     <input type="range" id="tamanhoRef" min="12" max="48" value="20">
 
-    <label>Fonte do Verso</label>
-    <select id="fonteVerso">
-      <option value="'Montserrat', sans-serif">Montserrat</option>
-      <option value="'Century Gothic', CenturyGothic, AppleGothic, sans-serif">Century Gothic</option>
-      <option value="Arial, sans-serif">Arial</option>
-      <option value="Georgia, serif">Georgia</option>
-    </select>
-
-    <label>Fonte da Referência</label>
-    <select id="fonteRef">
-      <option value="'Montserrat', sans-serif">Montserrat</option>
-      <option value="'Century Gothic', CenturyGothic, AppleGothic, sans-serif">Century Gothic</option>
-    </select>
-
-    <label>Cor do Verso</label>
+    <label>Cor Verso</label>
     <input type="color" id="corVerso" value="#ffffff">
 
-    <label>Cor da Referência</label>
-    <input type="color" id="corReferencia" value="#ffffff">
-
-    <label>Destaques (separar por vírgula)</label>
-    <input id="textoDestaque" placeholder="Ex: SENHOR, descanso, pastor">
-
-    <label>Cor do Destaque</label>
+    <label>Destaque</label>
+    <input id="textoDestaque" placeholder="Ex: SENHOR, descanso">
     <input type="color" id="corDestaque" value="#ffd700">
-
-    <button onclick="aplicarDestaques()">Aplicar Destaques</button>
-    <button onclick="closeModal()">Fechar</button>
+    <button onclick="aplicarDestaques()">Aplicar</button>
   </div>
 </div>
 
+<!-- POSIÇÃO -->
 <div class="modal" id="mPosicao">
   <div class="modal-content">
+    <button class="btn-fechar" onclick="closeModal()">✖</button>
     <h3>Posição</h3>
-
-    <label>Verso Vertical</label>
     <input type="range" id="posicaoVerso" min="0" max="80" value="10">
-
-    <label>Verso Horizontal</label>
-    <input type="range" id="posicaoVersoH" min="0" max="90" value="5">
-
-    <label>Ref Vertical</label>
-    <input type="range" id="posicaoRef" min="0" max="80" value="10">
-
-    <label>Ref Horizontal</label>
-    <input type="range" id="posicaoRefH" min="0" max="90" value="5">
-
-    <button onclick="closeModal()">Fechar</button>
+    <input type="range" id="posicaoVersoH" min="0" max="90" value="6">
   </div>
 </div>
 
+<!-- FUNDO -->
 <div class="modal" id="mFundo">
   <div class="modal-content">
+    <button class="btn-fechar" onclick="closeModal()">✖</button>
     <h3>Fundo</h3>
     <input type="file" id="uploadFundo">
-    <button onclick="closeModal()">Fechar</button>
   </div>
 </div>
 
 <script>
-const livros={"Gênesis":50,"Êxodo":40,"Levítico":27,"Números":36,"Deuteronômio":34,"Josué":24,"Juízes":21,"Rute":4,"1 Samuel":31,"2 Samuel":24,"Salmos":150,"Provérbios":31,"Isaías":66,"Mateus":28,"Marcos":16,"Lucas":24,"João":21,"Romanos":16,"Apocalipse":22};
-
+let biblia=[], textoOriginal="";
 const livro=document.getElementById("livro");
+const capitulo=document.getElementById("capitulo");
+const versiculo=document.getElementById("versiculo");
 const versoEl=document.getElementById("verso");
 const refEl=document.getElementById("referencia");
+const lista=document.getElementById("listaResultados");
 const container=document.getElementById("container");
-let textoOriginal="";
 
-for(let l in livros) livro.innerHTML+=`<option>${l}</option>`;
-livro.onchange=()=>{
+fetch("bible_acf.json")
+.then(r=>r.json())
+.then(d=>{biblia=d;init();});
+
+function init(){
+  biblia.forEach((b,i)=>livro.innerHTML+=`<option value="${i}">${b.name}</option>`);
+  livro.onchange=loadCaps;
+  capitulo.onchange=loadVers;
+  loadCaps();
+}
+
+function loadCaps(){
   capitulo.innerHTML="";
-  for(let i=1;i<=livros[livro.value];i++) capitulo.innerHTML+=`<option>${i}</option>`;
-  versiculo.innerHTML="";
-  for(let i=1;i<=60;i++) versiculo.innerHTML+=`<option>${i}</option>`;
-};
-livro.onchange();
+  biblia[livro.value].chapters.forEach((_,i)=>
+    capitulo.innerHTML+=`<option value="${i}">${i+1}</option>`
+  );
+  loadVers();
+}
 
-async function buscarVersiculo(){
-  const r=await fetch(`https://bible-api.com/${livro.value}+${capitulo.value}:${versiculo.value}?translation=almeida`);
-  const d=await r.json();
-  textoOriginal=d.text.toUpperCase();
+function loadVers(){
+  versiculo.innerHTML="";
+  biblia[livro.value].chapters[capitulo.value].forEach((_,i)=>
+    versiculo.innerHTML+=`<option value="${i}">${i+1}</option>`
+  );
+}
+
+function buscarVersiculo(){
+  const b=biblia[livro.value];
+  textoOriginal=b.chapters[capitulo.value][versiculo.value].toUpperCase();
   versoEl.innerText=textoOriginal;
-  refEl.innerText=`${livro.value.toUpperCase()} ${capitulo.value}:${versiculo.value}`;
+  refEl.innerText=`${b.name.toUpperCase()} ${+capitulo.value+1}:${+versiculo.value+1}`;
   closeModal();
+}
+
+function normalizar(t){
+  return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+
+function buscarPorPalavra(){
+  lista.innerHTML="";
+  const termo=normalizar(buscaPalavra.value);
+  if(!termo) return;
+
+  biblia.forEach(b=>{
+    b.chapters.forEach((c,i)=>{
+      c.forEach((t,v)=>{
+        if(normalizar(t).includes(termo)){
+          const d=document.createElement("div");
+          d.className="resultado";
+          d.innerHTML=`<b>${b.name} ${i+1}:${v+1}</b><br>${t}`;
+          d.onclick=()=>{
+            textoOriginal=t.toUpperCase();
+            versoEl.innerText=textoOriginal;
+            refEl.innerText=`${b.name.toUpperCase()} ${i+1}:${v+1}`;
+            closeModal();
+          }
+          lista.appendChild(d);
+        }
+      });
+    });
+  });
 }
 
 tamanhoVerso.oninput=e=>versoEl.style.fontSize=e.target.value+"px";
 tamanhoRef.oninput=e=>refEl.style.fontSize=e.target.value+"px";
-fonteVerso.onchange=e=>versoEl.style.fontFamily=e.target.value;
-fonteRef.onchange=e=>refEl.style.fontFamily=e.target.value;
 corVerso.oninput=e=>versoEl.style.color=e.target.value;
-corReferencia.oninput=e=>refEl.style.color=e.target.value;
-
 posicaoVerso.oninput=e=>versoEl.style.top=e.target.value+"%";
 posicaoVersoH.oninput=e=>versoEl.style.left=e.target.value+"%";
-posicaoRef.oninput=e=>refEl.style.bottom=e.target.value+"%";
-posicaoRefH.oninput=e=>refEl.style.left=e.target.value+"%";
 
 function aplicarDestaques(){
-  if(!textoOriginal) return;
-  let texto=textoOriginal;
+  let t=textoOriginal;
   textoDestaque.value.split(",").forEach(p=>{
     p=p.trim();
-    if(p){
-      texto=texto.replace(new RegExp(`(${p})`,"gi"),
-        `<mark style="color:${corDestaque.value}">$1</mark>`);
-    }
+    if(p) t=t.replace(new RegExp(`(${p})`,"gi"),
+      `<mark style="color:${corDestaque.value}">$1</mark>`);
   });
-  versoEl.innerHTML=texto;
+  versoEl.innerHTML=t;
 }
 
 uploadFundo.onchange=e=>{
@@ -269,10 +337,9 @@ uploadFundo.onchange=e=>{
   r.readAsDataURL(e.target.files[0]);
 };
 
-let refVisivel=true;
-function toggleRef(){refVisivel=!refVisivel;refEl.style.display=refVisivel?"block":"none";}
 function openModal(id){document.getElementById(id).style.display="flex";}
 function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none");}
+function toggleRef(){refEl.style.display=refEl.style.display=="none"?"block":"none";}
 function baixarImagem(){
   html2canvas(container).then(c=>{
     const a=document.createElement("a");
