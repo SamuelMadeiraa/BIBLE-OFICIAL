@@ -216,6 +216,9 @@ mark{background:none;font-weight:800}
     <label>Cor Verso</label>
     <input type="color" id="corVerso" value="#ffffff">
 
+    <label>Cor Referência</label>
+    <input type="color" id="corRef" value="#ffffff">
+
     <label>Destaque</label>
     <input id="textoDestaque" placeholder="Ex: SENHOR, descanso">
     <input type="color" id="corDestaque" value="#ffd700">
@@ -228,8 +231,18 @@ mark{background:none;font-weight:800}
   <div class="modal-content">
     <button class="btn-fechar" onclick="closeModal()">✖</button>
     <h3>Posição</h3>
+
+    <label>Verso (Vertical)</label>
     <input type="range" id="posicaoVerso" min="0" max="80" value="10">
+
+    <label>Verso (Horizontal)</label>
     <input type="range" id="posicaoVersoH" min="0" max="90" value="6">
+
+    <label>Referência (Vertical)</label>
+    <input type="range" id="posicaoRef" min="0" max="90" value="9">
+
+    <label>Referência (Horizontal)</label>
+    <input type="range" id="posicaoRefH" min="0" max="90" value="6">
   </div>
 </div>
 
@@ -318,8 +331,13 @@ function buscarPorPalavra(){
 tamanhoVerso.oninput=e=>versoEl.style.fontSize=e.target.value+"px";
 tamanhoRef.oninput=e=>refEl.style.fontSize=e.target.value+"px";
 corVerso.oninput=e=>versoEl.style.color=e.target.value;
+corRef.oninput=e=>refEl.style.color=e.target.value;
+
 posicaoVerso.oninput=e=>versoEl.style.top=e.target.value+"%";
 posicaoVersoH.oninput=e=>versoEl.style.left=e.target.value+"%";
+
+posicaoRef.oninput=e=>refEl.style.bottom=e.target.value+"%";
+posicaoRefH.oninput=e=>refEl.style.left=e.target.value+"%";
 
 function aplicarDestaques(){
   let t=textoOriginal;
