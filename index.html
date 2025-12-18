@@ -7,6 +7,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0d0d0d">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -365,6 +367,10 @@ function baixarImagem(){
     a.download="versiculo.png";
     a.click();
   });
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js");
 }
 </script>
 
